@@ -29,4 +29,19 @@ document.addEventListener('DOMContentLoaded', () => {
         element.style.transform = 'translateY(20px)';
         observer.observe(element);
     });
+
+    const aesCard = document.getElementById('aes-card');
+    const aesAnim = document.getElementById('aes-anim');
+    
+    if(aesCard && aesAnim) {
+        aesCard.addEventListener('click', () => {
+            aesAnim.classList.toggle('active');
+            if(aesAnim.classList.contains('active')) {
+                // restart animation
+                aesAnim.classList.remove('run-anim');
+                void aesAnim.offsetWidth; // trigger reflow
+                aesAnim.classList.add('run-anim');
+            }
+        });
+    }
 });

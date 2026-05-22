@@ -10,23 +10,35 @@
 <body>
 
     <header class="hero">
-        <img src="assets/kosha_with_name.png" alt="Kosha Logo">
-        <p class="tagline">Absolute Privacy. Absolute Security.<br>A fully offline, hardware-encrypted password vault.</p>
+        <div class="hero-left">
+            <img src="assets/kosha_with_name.png" alt="Kosha Logo" class="main-logo">
+            <p class="tagline">Absolute Privacy. Absolute Security.<br>A fully offline, hardware-encrypted password vault.</p>
+        </div>
         
-        <div class="download-section">
-            <div>
-                <a href="../public/kosha.apk" class="download-btn" download>Download APK</a>
-                <p style="margin-top: 1rem; color: var(--text-muted); font-size: 0.9rem;">Android API 26+</p>
+        <div class="hero-right">
+            <div class="download-section">
+                <div>
+                    <a href="../public/kosha.apk" class="download-btn" download>Download APK</a>
+                    <p style="margin-top: 1rem; color: var(--text-muted); font-size: 0.9rem;">Android API 26+</p>
+                </div>
+                <img src="assets/qrcode.png" alt="Scan to Download APK" class="qr-code">
             </div>
-            <img src="assets/qrcode.png" alt="Scan to Download APK" class="qr-code">
         </div>
     </header>
 
     <main>
         <section class="features">
-            <div class="feature-card animate-on-scroll">
+            <div class="feature-card animate-on-scroll" id="aes-card">
                 <h3>AES-256 GCM Encryption</h3>
                 <p>Your data is encrypted at rest using military-grade AES-256 GCM encryption. The cryptographic keys are safely stored in the Android hardware Keystore and never leave your device.</p>
+                <div class="expand-hint">Click to see how it works &rarr;</div>
+                <div class="animation-container" id="aes-anim">
+                    <div class="anim-track">
+                        <div class="anim-data">Plaintext</div>
+                        <div class="anim-lock">🔐 Key</div>
+                        <div class="anim-cipher">Ciphertext</div>
+                    </div>
+                </div>
             </div>
             
             <div class="feature-card animate-on-scroll">
