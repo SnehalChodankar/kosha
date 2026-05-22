@@ -1,0 +1,295 @@
+package com.locker.ui.screens
+
+import androidx.annotation.DrawableRes
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.locker.R
+import com.locker.viewmodel.LockerViewModel
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun AddEditScreen(
+    viewModel: LockerViewModel,
+    initialPassword: String? = null,
+    editingItemId: Int? = null,
+    onBack: () -> Unit,
+    onSave: () -> Unit
+) {
+    val categories by viewModel.categories.collectAsState()
+    
+    var title by remember { mutableStateOf("") }
+    var username by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf(initialPassword ?: "") }
+    var selectedCategoryName by remember { mutableStateOf<String?>(null) }
+    var selectedBrand by remember { mutableStateOf<Brand?>(null) }
+    var itemLoaded by remember { mutableStateOf(editingItemId == null) }
+
+    LaunchedEffect(editingItemId) {
+        if (editingItemId != null) {
+            viewModel.getItemById(editingItemId).collect { item ->
+                if (item != null) {
+                    title = item.title
+                    username = item.username
+                    password = item.secretValue
+                    selectedCategoryName = item.category
+                    // In a real app we'd map title/brand back, for now assume title matches brand name or just keep text
+                    itemLoaded = true
+                }
+            }
+        }
+    }
+
+    // If categories load and nothing is selected, select the first one
+    LaunchedEffect(categories) {
+        if (selectedCategoryName == null && categories.isNotEmpty()) {
+            selectedCategoryName = categories.first().name
+        }
+    }
+
+    // Fetch brands for the selected category dynamically
+    val assignedBrandIds by viewModel.getBrandsForCategory(selectedCategoryName ?: "").collectAsState(initial = emptyList())
+    val suggestedBrands = assignedBrandIds.mapNotNull { BrandCatalog.getBrandById(it) }
+
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text(if (editingItemId != null) "Edit Password" else "Add Password", fontWeight = FontWeight.Bold) },
+                navigationIcon = {
+                    IconButton(onClick = onBack) {
+                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                    }
+                }
+            )
+        }
+    ) { padding ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding)
+                .padding(horizontal = 24.dp)
+                .verticalScroll(rememberScrollState())
+        ) {
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // ── Category Selection (Dynamic Flowing Row) ──────────────────────
+            Text(
+                "Select Category",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.SemiBold
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+
+            @OptIn(ExperimentalLayoutApi::class)
+            FlowRow(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
+                categories.forEach { cat ->
+                    FilterChip(
+                        selected = cat.name == selectedCategoryName,
+                        onClick = {
+                            selectedCategoryName = cat.name
+                            selectedBrand = null
+                        },
+                        label = {
+                            Text(
+                                cat.name,
+                                maxLines = 1,
+                                style = MaterialTheme.typography.labelSmall
+                            )
+                        },
+                        colors = FilterChipDefaults.filterChipColors(
+                            selectedContainerColor = MaterialTheme.colorScheme.primary,
+                            selectedLabelColor = MaterialTheme.colorScheme.onPrimary
+                        )
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            // ── Brand Suggestions (real logos) ────────────────────────────
+            Text(
+                "Quick Add Brand",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.SemiBold
+            )
+            Spacer(modifier = Modifier.height(12.dp))
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .horizontalScroll(rememberScrollState()),
+                horizontalArrangement = Arrangement.spacedBy(20.dp)
+            ) {
+                if (suggestedBrands.isEmpty()) {
+                    Text(
+                        "No brands assigned to this category. Edit category in Settings.",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                } else {
+                    suggestedBrands.forEach { brand ->
+                        val isSelected = selectedBrand?.name == brand.name
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            modifier = Modifier.clickable {
+                                title = brand.name
+                                selectedBrand = brand
+                            }
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .size(56.dp)
+                                    .clip(CircleShape)
+                                    .background(
+                                        if (isSelected)
+                                            MaterialTheme.colorScheme.primary.copy(alpha = 0.2f)
+                                        else
+                                            MaterialTheme.colorScheme.surfaceVariant
+                                    ),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Image(
+                                    painter = painterResource(id = brand.logoRes),
+                                    contentDescription = brand.name,
+                                    contentScale = ContentScale.Fit,
+                                    modifier = Modifier
+                                        .size(38.dp)
+                                        .clip(CircleShape)
+                                )
+                            }
+                            Spacer(modifier = Modifier.height(4.dp))
+                            Text(
+                                text = brand.name,
+                                style = MaterialTheme.typography.labelSmall,
+                                color = if (isSelected)
+                                    MaterialTheme.colorScheme.primary
+                                else
+                                    MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                            if (isSelected) {
+                                Box(
+                                    modifier = Modifier
+                                        .size(4.dp)
+                                        .clip(CircleShape)
+                                        .background(MaterialTheme.colorScheme.primary)
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(32.dp))
+
+            // ── Form Fields ───────────────────────────────────────────────
+            OutlinedTextField(
+                value = title,
+                onValueChange = { title = it },
+                label = { Text("Title  (e.g. Netflix)") },
+                modifier = Modifier.fillMaxWidth(),
+                singleLine = true,
+                leadingIcon = {
+                    if (selectedBrand != null) {
+                        Image(
+                            painter = painterResource(id = selectedBrand!!.logoRes),
+                            contentDescription = null,
+                            contentScale = ContentScale.Fit,
+                            modifier = Modifier
+                                .size(24.dp)
+                                .clip(RoundedCornerShape(4.dp))
+                        )
+                    } else if (title.isNotBlank()) {
+                        Box(
+                            modifier = Modifier
+                                .size(24.dp)
+                                .clip(RoundedCornerShape(4.dp))
+                                .background(MaterialTheme.colorScheme.primary),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = title.first().uppercase(),
+                                color = Color.White,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 12.sp
+                            )
+                        }
+                    }
+                }
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            OutlinedTextField(
+                value = username,
+                onValueChange = { username = it },
+                label = { Text("Username / Email  (optional)") },
+                modifier = Modifier.fillMaxWidth(),
+                singleLine = true
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            OutlinedTextField(
+                value = password,
+                onValueChange = { password = it },
+                label = { Text("Password or PIN") },
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Spacer(modifier = Modifier.height(48.dp))
+
+            Button(
+                onClick = {
+                    if (title.isNotBlank() && password.isNotBlank() && selectedCategoryName != null) {
+                        if (editingItemId != null) {
+                            viewModel.updateItem(
+                                com.locker.data.db.LockerItem(
+                                    id = editingItemId,
+                                    title = title,
+                                    username = username.trim(),
+                                    secretValue = password,
+                                    category = selectedCategoryName!!
+                                )
+                            )
+                        } else {
+                            viewModel.insert(title, username.trim(), password, selectedCategoryName!!)
+                        }
+                        onSave()
+                    }
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(56.dp),
+                enabled = title.isNotBlank() && password.isNotBlank() && selectedCategoryName != null,
+                shape = RoundedCornerShape(12.dp)
+            ) {
+                Text("Save to Vault", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+            }
+
+            Spacer(modifier = Modifier.height(24.dp))
+        }
+    }
+}
