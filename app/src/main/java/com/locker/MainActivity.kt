@@ -198,7 +198,7 @@ class MainActivity : FragmentActivity() {
                                                                 lifecycleScope.launch {
                                                                     try {
                                                                         val timestamp = java.text.SimpleDateFormat("yyyyMMdd_HHmmss", java.util.Locale.US).format(java.util.Date())
-                                                                        val filename = "LockerBackup_$timestamp.locker"
+                                                                        val filename = "KoshaBackup_$timestamp.kosha"
                                                                         val pin = BackupCryptoManager.generatePin()
                                                                         val encryptedData = vm.exportData(pin)
                                                                         
@@ -314,7 +314,7 @@ class MainActivity : FragmentActivity() {
         isExternalActionActive = true
         val executor = ContextCompat.getMainExecutor(this)
         val promptInfo = BiometricPrompt.PromptInfo.Builder()
-            .setTitle("Unlock Locker")
+            .setTitle("Unlock Kosha")
             .setSubtitle("Authenticate to access your passwords")
             .setAllowedAuthenticators(androidx.biometric.BiometricManager.Authenticators.BIOMETRIC_STRONG or androidx.biometric.BiometricManager.Authenticators.DEVICE_CREDENTIAL)
             .build()

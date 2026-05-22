@@ -48,6 +48,10 @@
         "source": "com.locker.app-main-61:/drawable/brand_github.png"
     },
     {
+        "merged": "com.locker.app-merged_res-59:/mipmap-anydpi-v26_ic_launcher_round.xml.flat",
+        "source": "com.locker.app-main-61:/mipmap-anydpi-v26/ic_launcher_round.xml"
+    },
+    {
         "merged": "com.locker.app-merged_res-59:/drawable_brand_flipkart.png.flat",
         "source": "com.locker.app-main-61:/drawable/brand_flipkart.png"
     },
@@ -78,6 +82,10 @@
     {
         "merged": "com.locker.app-merged_res-59:/drawable_brand_paypal.png.flat",
         "source": "com.locker.app-main-61:/drawable/brand_paypal.png"
+    },
+    {
+        "merged": "com.locker.app-merged_res-59:/drawable_kosha_with_name.png.flat",
+        "source": "com.locker.app-main-61:/drawable/kosha_with_name.png"
     },
     {
         "merged": "com.locker.app-merged_res-59:/drawable_brand_google.png.flat",
@@ -124,12 +132,20 @@
         "source": "com.locker.app-main-61:/drawable/brand_linkedin.png"
     },
     {
+        "merged": "com.locker.app-merged_res-59:/mipmap-anydpi-v26_ic_launcher.xml.flat",
+        "source": "com.locker.app-main-61:/mipmap-anydpi-v26/ic_launcher.xml"
+    },
+    {
         "merged": "com.locker.app-merged_res-59:/drawable_brand_apple.png.flat",
         "source": "com.locker.app-main-61:/drawable/brand_apple.png"
     },
     {
         "merged": "com.locker.app-merged_res-59:/drawable_brand_windows.png.flat",
         "source": "com.locker.app-main-61:/drawable/brand_windows.png"
+    },
+    {
+        "merged": "com.locker.app-merged_res-59:/drawable_kosha.png.flat",
+        "source": "com.locker.app-main-61:/drawable/kosha.png"
     },
     {
         "merged": "com.locker.app-merged_res-59:/drawable_brand_icloud.png.flat",

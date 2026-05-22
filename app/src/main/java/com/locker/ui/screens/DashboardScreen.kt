@@ -185,7 +185,7 @@ fun DashboardScreen(
                 )
             } else {
                 TopAppBar(
-                    title = { Text("Vault", fontWeight = FontWeight.Bold) }
+                    title = { Text("Kosha", fontWeight = FontWeight.Bold) }
                 )
             }
         },

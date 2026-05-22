@@ -19,6 +19,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
+import androidx.compose.foundation.Image
+import androidx.compose.ui.res.painterResource
+import com.locker.R
+
 @Composable
 fun AuthScreen(
     onAuthenticateClick: () -> Unit,
@@ -32,15 +36,14 @@ fun AuthScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Icon(
-            imageVector = Icons.Default.Lock,
-            contentDescription = "Lock Icon",
-            modifier = Modifier.size(80.dp),
-            tint = MaterialTheme.colorScheme.primary
+        Image(
+            painter = painterResource(id = R.drawable.kosha_with_name),
+            contentDescription = "Kosha Logo",
+            modifier = Modifier.size(160.dp)
         )
         Spacer(modifier = Modifier.height(24.dp))
         Text(
-            text = "Locker is Locked",
+            text = "Kosha is Locked",
             style = MaterialTheme.typography.titleLarge,
             color = MaterialTheme.colorScheme.onBackground
         )

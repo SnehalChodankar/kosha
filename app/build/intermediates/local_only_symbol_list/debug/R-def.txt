@@ -38,6 +38,10 @@ drawable brand_uber
 drawable brand_windows
 drawable brand_zerodha
 drawable ic_launcher
+drawable kosha
+drawable kosha_with_name
+mipmap ic_launcher
+mipmap ic_launcher_round
 string app_name
 style Theme.Locker
 xml backup_rules

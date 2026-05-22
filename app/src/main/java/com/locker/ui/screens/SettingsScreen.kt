@@ -46,10 +46,10 @@ fun SettingsScreen(
             title = { Text("Auto-lock on Minimize") },
             text = {
                 Text(
-                    "When enabled, the Locker vault will automatically lock itself the moment " +
+                    "When enabled, the Kosha vault will automatically lock itself the moment " +
                     "you switch to another app or minimize. You'll need to re-authenticate with " +
                     "biometrics or your device PIN to regain access.\n\n" +
-                    "This feature requires a lifecycle observer hook and is coming in the next update."
+                    "This feature is currently active to ensure maximum security."
                 )
             },
             confirmButton = {
@@ -132,10 +132,10 @@ fun SettingsScreen(
         AlertDialog(
             onDismissRequest = { showAboutDialog = false },
             icon = { Icon(Icons.Default.Info, contentDescription = null) },
-            title = { Text("About Locker") },
+            title = { Text("About Kosha") },
             text = {
                 Text(
-                    "Locker v1.0\n\n" +
+                    "Kosha v1.0\n\n" +
                     "A fully offline, hardware-encrypted password vault.\n\n" +
                     "• AES-256 GCM encryption via Android Keystore\n" +
                     "• SQLCipher encrypted database at rest\n" +
@@ -202,7 +202,7 @@ fun SettingsScreen(
             SettingsGroupLabel("About")
 
             SettingsItem(
-                title = "About Locker",
+                title = "About Kosha",
                 subtitle = "Version 1.0 • Fully offline & encrypted",
                 icon = { Icon(Icons.Default.Info, contentDescription = null) },
                 onClick = { showAboutDialog = true }
