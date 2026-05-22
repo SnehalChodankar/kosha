@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kosha - Absolute Privacy. Absolute Security.</title>
+    <meta name="description" content="Kosha is an offline-first, AES-256 GCM encrypted password and credential manager.">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <header class="hero">
+        <img src="assets/kosha_with_name.png" alt="Kosha Logo">
+        <p class="tagline">Absolute Privacy. Absolute Security.<br>A fully offline, hardware-encrypted password vault.</p>
+        
+        <div class="download-section">
+            <div>
+                <a href="../public/kosha.apk" class="download-btn" download>Download APK</a>
+                <p style="margin-top: 1rem; color: var(--text-muted); font-size: 0.9rem;">Android API 26+</p>
+            </div>
+            <img src="assets/qrcode.png" alt="Scan to Download APK" class="qr-code">
+        </div>
+    </header>
+
+    <main>
+        <section class="features">
+            <div class="feature-card animate-on-scroll">
+                <h3>AES-256 GCM Encryption</h3>
+                <p>Your data is encrypted at rest using military-grade AES-256 GCM encryption. The cryptographic keys are safely stored in the Android hardware Keystore and never leave your device.</p>
+            </div>
+            
+            <div class="feature-card animate-on-scroll">
+                <h3>Zero Cloud. Zero Tracking.</h3>
+                <p>Kosha operates 100% offline. There are no servers, no cloud backups, no telemetry, and no tracking. You are the sole owner of your data.</p>
+            </div>
+            
+            <div class="feature-card animate-on-scroll">
+                <h3>Encrypted Database</h3>
+                <p>The entire internal SQLite database is encrypted using SQLCipher. Even if your device is compromised or rooted, attackers cannot read your database without your biometric unlock.</p>
+            </div>
+
+            <div class="feature-card animate-on-scroll">
+                <h3>Encrypted Exports</h3>
+                <p>Safely export your data into a `.kosha` file. Your exports are heavily encrypted using ChaCha20-Poly1305 and a uniquely generated 6-digit PIN, ensuring safe transit to other devices.</p>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="legal">
+            <img src="assets/kosha.png" alt="Kosha Icon" style="width: 48px; opacity: 0.5; margin-bottom: 1rem;">
+            <h4>Privacy Notice</h4>
+            <p><strong>We collect absolutely nothing.</strong> The Kosha application does not request internet permissions, does not include any analytics or tracking SDKs, and does not transmit data off your device. Your passwords, categories, and settings are stored locally and encrypted.</p>
+            
+            <h4>Disclaimer</h4>
+            <p>The Kosha software is provided "as is", without warranty of any kind, express or implied, including but not limited to the warranties of merchantability, fitness for a particular purpose and noninfringement. In no event shall the authors or copyright holders be liable for any claim, damages or other liability, whether in an action of contract, tort or otherwise, arising from, out of or in connection with the software or the use or other dealings in the software.</p>
+            <p>If you forget your master password or lose your generated export PINs, your data is permanently inaccessible. We cannot recover it for you.</p>
+            
+            <p style="margin-top: 3rem; opacity: 0.5;">&copy; 2026 Kosha. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="js/script.js"></script>
+</body>
+</html>
