@@ -30,18 +30,17 @@ document.addEventListener('DOMContentLoaded', () => {
         observer.observe(element);
     });
 
-    const aesCard = document.getElementById('aes-card');
-    const aesAnim = document.getElementById('aes-anim');
-    
-    if(aesCard && aesAnim) {
-        aesCard.addEventListener('click', () => {
-            aesAnim.classList.toggle('active');
-            if(aesAnim.classList.contains('active')) {
-                // restart animation
-                aesAnim.classList.remove('run-anim');
-                void aesAnim.offsetWidth; // trigger reflow
-                aesAnim.classList.add('run-anim');
-            }
-        });
-    }
+    document.querySelectorAll('.feature-card').forEach(card => {
+        const anim = card.querySelector('.animation-container');
+        if (anim) {
+            card.addEventListener('click', () => {
+                anim.classList.toggle('active');
+                if(anim.classList.contains('active')) {
+                    anim.classList.remove('run-anim');
+                    void anim.offsetWidth; // trigger reflow
+                    anim.classList.add('run-anim');
+                }
+            });
+        }
+    });
 });

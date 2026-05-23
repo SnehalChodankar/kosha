@@ -119,6 +119,7 @@ body {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     gap: 2rem;
+    align-items: start;
 }
 
 .feature-card {
@@ -251,13 +252,13 @@ footer {
 }
 
 .run-anim .anim-data {
-    animation: moveRight 2s forwards;
+    animation: moveRight 2s both 0.4s;
 }
 .run-anim .anim-lock {
-    animation: pulseLock 2s forwards;
+    animation: pulseLock 2s both 0.4s;
 }
 .run-anim .anim-cipher {
-    animation: appearCipher 2s forwards;
+    animation: appearCipher 2s both 0.4s;
 }
 
 @keyframes moveRight {
@@ -275,5 +276,47 @@ footer {
 @keyframes appearCipher {
     0% { opacity: 0; transform: translateX(-90px) scale(0.5); }
     50% { opacity: 0; transform: translateX(-90px) scale(0.5); }
+    100% { opacity: 1; transform: translateX(0) scale(1); }
+}
+
+/* Cloud Animation */
+.anim-server { font-size: 1.5rem; position: relative; }
+.anim-server::after { content: '❌'; position: absolute; left: 0; right: 0; top: 0; bottom: 0; font-size: 1.5rem; opacity: 0; }
+.run-anim .anim-server::after { animation: showCross 2s both 0.4s; }
+
+@keyframes showCross {
+    0% { opacity: 0; transform: scale(0); }
+    50% { opacity: 1; transform: scale(1.5); }
+    100% { opacity: 1; transform: scale(1); }
+}
+
+/* Database Animation */
+.anim-db { font-size: 1.5rem; }
+.anim-db-lock { font-size: 1.5rem; opacity: 0; transform: scale(0); }
+.run-anim .anim-db-lock { animation: shieldProtect 2s both 0.4s; }
+
+@keyframes shieldProtect {
+    0% { opacity: 0; transform: scale(0) translateX(50px); }
+    50% { opacity: 1; transform: scale(1.5) translateX(0); }
+    100% { opacity: 1; transform: scale(1) translateX(0); }
+}
+
+/* Export Animation */
+.anim-export-file { padding: 0.5rem 1rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); font-size: 0.8rem; background: #222; }
+.anim-export-pin { font-size: 1.5rem; }
+.anim-export-secure { padding: 0.5rem 1rem; background: var(--secondary); color: black; font-weight: bold; border-radius: 8px; font-size: 0.8rem; opacity: 0; }
+
+.run-anim .anim-export-file { animation: moveRightExport 2s both 0.4s; }
+.run-anim .anim-export-pin { animation: pulseLock 2s both 0.4s; }
+.run-anim .anim-export-secure { animation: appearSecure 2s both 0.4s; }
+
+@keyframes moveRightExport {
+    0% { transform: translateX(0) scale(1); opacity: 1; }
+    40% { transform: translateX(70px) scale(0.5); opacity: 0; }
+    100% { transform: translateX(70px) scale(0.5); opacity: 0; }
+}
+@keyframes appearSecure {
+    0% { opacity: 0; transform: translateX(-70px) scale(0.5); }
+    50% { opacity: 0; transform: translateX(-70px) scale(0.5); }
     100% { opacity: 1; transform: translateX(0) scale(1); }
 }
