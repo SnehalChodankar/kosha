@@ -252,19 +252,19 @@ footer {
 }
 
 .run-anim .anim-data {
-    animation: moveRight 2s both 0.4s;
+    animation: moveRight 4s both 0.4s;
 }
 .run-anim .anim-lock {
-    animation: pulseLock 2s both 0.4s;
+    animation: pulseLock 4s both 0.4s;
 }
 .run-anim .anim-cipher {
-    animation: appearCipher 2s both 0.4s;
+    animation: appearCipher 4s both 0.4s;
 }
 
 @keyframes moveRight {
     0% { transform: translateX(0) scale(1); opacity: 1; }
-    40% { transform: translateX(90px) scale(0.5); opacity: 0; }
-    100% { transform: translateX(90px) scale(0.5); opacity: 0; }
+    40% { transform: translateX(70px) scale(0.5); opacity: 0; }
+    100% { transform: translateX(70px) scale(0.5); opacity: 0; }
 }
 
 @keyframes pulseLock {
@@ -274,15 +274,15 @@ footer {
 }
 
 @keyframes appearCipher {
-    0% { opacity: 0; transform: translateX(-90px) scale(0.5); }
-    50% { opacity: 0; transform: translateX(-90px) scale(0.5); }
+    0% { opacity: 0; transform: translateX(-70px) scale(0.5); }
+    50% { opacity: 0; transform: translateX(-70px) scale(0.5); }
     100% { opacity: 1; transform: translateX(0) scale(1); }
 }
 
 /* Cloud Animation */
 .anim-server { font-size: 1.5rem; position: relative; }
 .anim-server::after { content: '❌'; position: absolute; left: 0; right: 0; top: 0; bottom: 0; font-size: 1.5rem; opacity: 0; }
-.run-anim .anim-server::after { animation: showCross 2s both 0.4s; }
+.run-anim .anim-server::after { animation: showCross 4s both 0.4s; }
 
 @keyframes showCross {
     0% { opacity: 0; transform: scale(0); }
@@ -293,7 +293,7 @@ footer {
 /* Database Animation */
 .anim-db { font-size: 1.5rem; }
 .anim-db-lock { font-size: 1.5rem; opacity: 0; transform: scale(0); }
-.run-anim .anim-db-lock { animation: shieldProtect 2s both 0.4s; }
+.run-anim .anim-db-lock { animation: shieldProtect 4s both 0.4s; }
 
 @keyframes shieldProtect {
     0% { opacity: 0; transform: scale(0) translateX(50px); }
@@ -306,18 +306,18 @@ footer {
 .anim-export-pin { font-size: 1.5rem; }
 .anim-export-secure { padding: 0.5rem 1rem; background: var(--secondary); color: black; font-weight: bold; border-radius: 8px; font-size: 0.8rem; opacity: 0; }
 
-.run-anim .anim-export-file { animation: moveRightExport 2s both 0.4s; }
-.run-anim .anim-export-pin { animation: pulseLock 2s both 0.4s; }
-.run-anim .anim-export-secure { animation: appearSecure 2s both 0.4s; }
+.run-anim .anim-export-file { animation: moveRightExport 4s both 0.4s; }
+.run-anim .anim-export-pin { animation: pulseLock 4s both 0.4s; }
+.run-anim .anim-export-secure { animation: appearSecure 4s both 0.4s; }
 
 @keyframes moveRightExport {
     0% { transform: translateX(0) scale(1); opacity: 1; }
-    40% { transform: translateX(70px) scale(0.5); opacity: 0; }
-    100% { transform: translateX(70px) scale(0.5); opacity: 0; }
+    40% { transform: translateX(50px) scale(0.5); opacity: 0; }
+    100% { transform: translateX(50px) scale(0.5); opacity: 0; }
 }
 @keyframes appearSecure {
-    0% { opacity: 0; transform: translateX(-70px) scale(0.5); }
-    50% { opacity: 0; transform: translateX(-70px) scale(0.5); }
+    0% { opacity: 0; transform: translateX(-50px) scale(0.5); }
+    50% { opacity: 0; transform: translateX(-50px) scale(0.5); }
     100% { opacity: 1; transform: translateX(0) scale(1); }
 }
 
@@ -326,15 +326,15 @@ footer {
 .anim-autofill-lock { font-size: 1.5rem; opacity: 0; }
 .anim-autofill-done { padding: 0.5rem 1rem; background: var(--primary); color: black; font-weight: bold; border-radius: 8px; font-size: 0.8rem; opacity: 0; }
 
-.run-anim .anim-app-field { animation: moveRightAutofill 2.5s both 0.4s; }
-.run-anim .anim-autofill-lock { animation: biometricPulse 2.5s both 0.4s; }
-.run-anim .anim-autofill-done { animation: appearFilled 2.5s both 0.4s; }
+.run-anim .anim-app-field { animation: moveRightAutofill 4s both 0.4s; }
+.run-anim .anim-autofill-lock { animation: biometricPulse 4s both 0.4s; }
+.run-anim .anim-autofill-done { animation: appearFilled 4s both 0.4s; }
 
 @keyframes moveRightAutofill {
     0% { transform: translateX(0) scale(1); opacity: 1; }
     30% { transform: translateX(0) scale(1); opacity: 1; }
-    50% { transform: translateX(80px) scale(0.5); opacity: 0; }
-    100% { transform: translateX(80px) scale(0.5); opacity: 0; }
+    50% { transform: translateX(30px) scale(0.5); opacity: 0; }
+    100% { transform: translateX(30px) scale(0.5); opacity: 0; }
 }
 
 @keyframes biometricPulse {
@@ -346,8 +346,8 @@ footer {
 }
 
 @keyframes appearFilled {
-    0% { opacity: 0; transform: translateX(-80px) scale(0.5); }
-    50% { opacity: 0; transform: translateX(-80px) scale(0.5); }
+    0% { opacity: 0; transform: translateX(-30px) scale(0.5); }
+    50% { opacity: 0; transform: translateX(-30px) scale(0.5); }
     70% { opacity: 1; transform: translateX(0) scale(1); }
     100% { opacity: 1; transform: translateX(0) scale(1); }
 }
