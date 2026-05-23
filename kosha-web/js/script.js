@@ -34,6 +34,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const anim = card.querySelector('.animation-container');
         if (anim) {
             card.addEventListener('click', () => {
+                // If we are opening this card, it will naturally expand. 
+                // The min-height keeps it aligned with others when closed.
                 anim.classList.toggle('active');
                 if(anim.classList.contains('active')) {
                     anim.classList.remove('run-anim');
@@ -43,4 +45,30 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
     });
+
+    // Dynamic height alignment
+    function alignCardHeights() {
+        const cards = document.querySelectorAll('.feature-card');
+        // Reset min-height to measure natural height
+        cards.forEach(card => card.style.minHeight = '0px');
+        let maxHeight = 0;
+        cards.forEach(card => {
+            // Measure only when animations are closed to get baseline height
+            const anim = card.querySelector('.animation-container');
+            const wasActive = anim && anim.classList.contains('active');
+            if (wasActive) anim.classList.remove('active');
+            
+            if (card.offsetHeight > maxHeight) {
+                maxHeight = card.offsetHeight;
+            }
+            
+            if (wasActive) anim.classList.add('active');
+        });
+        // Apply max height
+        cards.forEach(card => card.style.minHeight = maxHeight + 'px');
+    }
+    
+    window.addEventListener('load', alignCardHeights);
+    window.addEventListener('resize', alignCardHeights);
+    alignCardHeights();
 });
