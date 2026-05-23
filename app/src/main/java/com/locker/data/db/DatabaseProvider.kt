@@ -3,11 +3,19 @@ package com.locker.data.db
 import android.content.Context
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import net.sqlcipher.database.SupportFactory
+
+val MIGRATION_3_4 = object : Migration(3, 4) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+        database.execSQL("ALTER TABLE locker_items ADD COLUMN websiteUrl TEXT NOT NULL DEFAULT ''")
+        database.execSQL("ALTER TABLE locker_items ADD COLUMN notes TEXT NOT NULL DEFAULT ''")
+    }
+}
 
 object DatabaseProvider {
     @Volatile
@@ -21,7 +29,7 @@ object DatabaseProvider {
                 LockerDatabase::class.java,
                 "locker_encrypted.db"
             )
-            .fallbackToDestructiveMigration() // added to safely wipe during schema update since it's just local testing
+            .addMigrations(MIGRATION_3_4)
             .addCallback(object : RoomDatabase.Callback() {
                 override fun onCreate(db: SupportSQLiteDatabase) {
                     super.onCreate(db)

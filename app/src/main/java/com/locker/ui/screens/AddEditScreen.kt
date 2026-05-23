@@ -42,6 +42,8 @@ fun AddEditScreen(
     var password by remember { mutableStateOf(initialPassword ?: "") }
     var selectedCategoryName by remember { mutableStateOf<String?>(null) }
     var selectedBrand by remember { mutableStateOf<Brand?>(null) }
+    var websiteUrl by remember { mutableStateOf("") }
+    var notes by remember { mutableStateOf("") }
     var itemLoaded by remember { mutableStateOf(editingItemId == null) }
 
     LaunchedEffect(editingItemId) {
@@ -52,6 +54,8 @@ fun AddEditScreen(
                     username = item.username
                     password = item.secretValue
                     selectedCategoryName = item.category
+                    websiteUrl = item.websiteUrl
+                    notes = item.notes
                     // In a real app we'd map title/brand back, for now assume title matches brand name or just keep text
                     itemLoaded = true
                 }
@@ -157,6 +161,9 @@ fun AddEditScreen(
                             modifier = Modifier.clickable {
                                 title = brand.name
                                 selectedBrand = brand
+                                if (websiteUrl.isBlank() && brand.defaultUrl != null) {
+                                    websiteUrl = brand.defaultUrl!!
+                                }
                             }
                         ) {
                             Box(
@@ -259,6 +266,26 @@ fun AddEditScreen(
                 modifier = Modifier.fillMaxWidth()
             )
 
+            Spacer(modifier = Modifier.height(16.dp))
+
+            OutlinedTextField(
+                value = websiteUrl,
+                onValueChange = { websiteUrl = it },
+                label = { Text("Website URL (for Autofill)") },
+                modifier = Modifier.fillMaxWidth(),
+                singleLine = true
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            OutlinedTextField(
+                value = notes,
+                onValueChange = { notes = it },
+                label = { Text("Secure Notes  (optional)") },
+                modifier = Modifier.fillMaxWidth(),
+                minLines = 3
+            )
+
             Spacer(modifier = Modifier.height(48.dp))
 
             Button(
@@ -271,11 +298,20 @@ fun AddEditScreen(
                                     title = title,
                                     username = username.trim(),
                                     secretValue = password,
-                                    category = selectedCategoryName!!
+                                    category = selectedCategoryName!!,
+                                    websiteUrl = websiteUrl.trim(),
+                                    notes = notes.trim()
                                 )
                             )
                         } else {
-                            viewModel.insert(title, username.trim(), password, selectedCategoryName!!)
+                            viewModel.insert(
+                                title = title, 
+                                username = username.trim(), 
+                                secret = password, 
+                                categoryName = selectedCategoryName!!,
+                                websiteUrl = websiteUrl.trim(),
+                                notes = notes.trim()
+                            )
                         }
                         onSave()
                     }

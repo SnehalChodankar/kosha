@@ -11,13 +11,15 @@ class LockerRepository(private val lockerDao: LockerDao) {
 
     fun getAllItems(): Flow<List<LockerItem>> = lockerDao.getAllItems()
 
-    suspend fun insertItem(title: String, username: String, secretValue: String, categoryName: String) {
+    suspend fun insertItem(title: String, username: String, secretValue: String, categoryName: String, websiteUrl: String = "", notes: String = "") {
         lockerDao.insertItem(
             LockerItem(
                 title = title,
                 username = username,
                 secretValue = secretValue,
-                category = categoryName
+                category = categoryName,
+                websiteUrl = websiteUrl,
+                notes = notes
             )
         )
     }

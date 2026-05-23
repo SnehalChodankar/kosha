@@ -81,6 +81,8 @@ object BackupManager {
                         username = importedItem.username,
                         secretValue = importedItem.secretValue,
                         category = importedItem.category,
+                        websiteUrl = importedItem.websiteUrl ?: "",
+                        notes = importedItem.notes ?: "",
                         timestamp = importedItem.timestamp
                     )
                 )
