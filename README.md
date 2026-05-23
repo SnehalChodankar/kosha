@@ -4,6 +4,13 @@
 
 "Kosha" means "sheath", "layer", or "covering"—symbolizing the secure layers of encryption that protect your most sensitive data.
 
+## 📚 Deep Dive Documentation
+For detailed technical breakdowns of how Kosha works under the hood, please refer to our `docs/` directory:
+- [Architecture & Tech Stack](docs/architecture.md)
+- [Encryption & Security Deep Dive](docs/encryption.md)
+- [Autofill Integration](docs/autofill.md)
+- [Duress Protocol & Auto-Lock](docs/duress_protocol.md)
+
 ---
 
 ## 📥 Installation
@@ -11,18 +18,11 @@
 There are two primary ways to install Kosha on your Android device: using a pre-built APK, or building it yourself from the source code.
 
 ### Option 1: Use the Pre-Built APK (Easiest)
-
-If you simply want to install and use the app without compiling it:
-
-1. Navigate to the `public/` directory in this repository.
+1. Navigate to the `kosha-web/public/` directory in this repository, or visit the live website.
 2. Download the `kosha.apk` file to your Android device.
 3. Open the downloaded file to install it. 
-   *(Note: You may need to grant your device permission to "Install unknown apps" from your browser or file manager).*
-
----
 
 ### Option 2: Build the APK from Source
-
 If you prefer to review the code and build the application yourself to ensure maximum trust and security, follow these steps:
 
 #### Prerequisites
@@ -31,7 +31,6 @@ If you prefer to review the code and build the application yourself to ensure ma
 - An Android device (API 26+) or an Android Emulator for testing.
 
 #### Building via Command Line (Windows/Mac/Linux)
-
 1. Clone the repository and navigate into the root directory:
    ```bash
    git clone https://github.com/your-username/kosha.git
@@ -39,32 +38,20 @@ If you prefer to review the code and build the application yourself to ensure ma
    ```
 
 2. Run the Gradle build wrapper to compile the application:
-   - On **Windows**:
-     ```bash
-     .\gradlew.bat assembleDebug
-     ```
-   - On **macOS/Linux**:
-     ```bash
-     ./gradlew assembleDebug
-     ```
+   - On **Windows**: `.\gradlew.bat assembleDebug`
+   - On **macOS/Linux**: `./gradlew assembleDebug`
 
 3. Once the build finishes successfully, you can find the generated APK at:
-   `app/build/outputs/apk/debug/kosha.apk`
+   `app/build/outputs/apk/debug/app-debug.apk`
 
 4. You can transfer this APK to your phone to install it, or install it directly via ADB:
    ```bash
-   adb install app/build/outputs/apk/debug/kosha.apk
+   adb install app/build/outputs/apk/debug/app-debug.apk
    ```
-
-#### Building via Android Studio
-1. Open Android Studio.
-2. Select **Open an existing Android Studio project** and choose the cloned `kosha` directory.
-3. Allow Gradle to sync dependencies.
-4. Click the **Play (Run)** button in the top toolbar to build and install the app directly to your connected device or emulator.
 
 ---
 
-## ✨ Core Features & Security
+## ✨ Core Features Quick Overview
 
 ### ☁️ Zero Cloud Infrastructure
 Kosha operates 100% offline. We do not run any servers, there are no cloud backups, no telemetry SDKs, and absolutely no tracking. You are the sole owner of your data, ensuring it cannot be breached from a remote server.
@@ -73,18 +60,18 @@ Kosha operates 100% offline. We do not run any servers, there are no cloud backu
 Your data is never stored in plain text. The entire internal SQLite database is encrypted at rest using SQLCipher and military-grade AES-256 GCM encryption. The encryption keys are securely locked inside your device's hardware-backed Android Keystore.
 
 ### 👆 Biometric Integration & Flexible Auto-Lock
-Seamlessly unlock your vault using your device's native fingerprint or face scanner. Kosha actively monitors your screen touches and background activity. You can configure the Auto-Lock timer to secure the vault immediately upon minimizing the app, or after 1 minute of total inactivity, ensuring maximum security tailored to your workflow.
+Seamlessly unlock your vault using your device's native fingerprint or face scanner. Kosha actively monitors your screen touches and background activity to secure the vault immediately upon minimizing the app, or after 1 minute of total inactivity.
 
 ### ⚠️ Duress Protocol
-As an absolute last line of defense, Kosha features an invisible Duress Trigger. If you are forced to unlock the app, simply long-press the hidden trigger on the lock screen to reveal a secret PIN pad. Entering your pre-configured Duress PIN will instantly and irreversibly obliterate your encryption keys, securely wipe the SQLite databases, and seamlessly boot a brand new, empty vault. The app will falsely present a "Fatal Error 402: Encryption keys corrupted" decoy message, perfectly convincing an attacker that the vault self-destructed due to a security glitch.
+As an absolute last line of defense, Kosha features an invisible Duress Trigger. If you are forced to unlock the app, a secret PIN pad can be used to instantly and irreversibly obliterate your encryption keys and data, displaying a decoy error message to the attacker.
 
 ### ⚡ Seamless Autofill
-Kosha acts as a native Android Autofill Service. When you tap a password field in any app or web browser, Kosha gracefully prompts an "Unlock Kosha" chip. It strictly requires a biometric scan before decrypting the vault, ensuring your credentials are automatically and safely filled without opening the main app.
+Kosha acts as a native Android Autofill Service. When you tap a password field in any app or web browser, Kosha gracefully prompts an "Unlock Kosha" chip, securely filling credentials without opening the main app.
 
 ### 📦 Encrypted Exports
-You can safely export your entire vault into a portable `.kosha` file. The exported file is heavily encrypted using the ChaCha20-Poly1305 algorithm and a uniquely generated 6-digit PIN, allowing you to securely transfer your passwords to another device without relying on cloud sync.
+Safely export your entire vault into a portable `.kosha` file. The exported file is heavily encrypted using the ChaCha20-Poly1305 algorithm and a uniquely generated 6-digit PIN.
 
 ## 🗂️ Project Structure
 - `app/src/main/java/com/locker/`: Core application logic (ViewModels, UI screens, Database layer).
-- `app/src/main/res/`: Application resources (Themes, Drawables, Layouts).
-- `public/`: Pre-built APKs for easy download and distribution.
+- `docs/`: Technical documentation deep dives.
+- `kosha-web/`: The frontend static website for distributing Kosha.
