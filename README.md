@@ -72,8 +72,11 @@ Kosha operates 100% offline. We do not run any servers, there are no cloud backu
 ### 🛡️ SQLCipher Encrypted Database
 Your data is never stored in plain text. The entire internal SQLite database is encrypted at rest using SQLCipher and military-grade AES-256 GCM encryption. The encryption keys are securely locked inside your device's hardware-backed Android Keystore.
 
-### 👆 Biometric Integration & Auto-Lock
-Seamlessly unlock your vault using your device's native fingerprint or face scanner. For maximum security, Kosha features an aggressive Auto-Lock system—the moment you minimize the app, switch to another app, or lock your phone, your vault is instantly re-secured.
+### 👆 Biometric Integration & Flexible Auto-Lock
+Seamlessly unlock your vault using your device's native fingerprint or face scanner. Kosha actively monitors your screen touches and background activity. You can configure the Auto-Lock timer to secure the vault immediately upon minimizing the app, or after 1 minute of total inactivity, ensuring maximum security tailored to your workflow.
+
+### ⚠️ Duress Protocol
+As an absolute last line of defense, Kosha features an invisible Duress Trigger. If you are forced to unlock the app, simply long-press the hidden trigger on the lock screen to reveal a secret PIN pad. Entering your pre-configured Duress PIN will instantly and irreversibly obliterate your encryption keys, securely wipe the SQLite databases, and seamlessly boot a brand new, empty vault. The app will falsely present a "Fatal Error 402: Encryption keys corrupted" decoy message, perfectly convincing an attacker that the vault self-destructed due to a security glitch.
 
 ### ⚡ Seamless Autofill
 Kosha acts as a native Android Autofill Service. When you tap a password field in any app or web browser, Kosha gracefully prompts an "Unlock Kosha" chip. It strictly requires a biometric scan before decrypting the vault, ensuring your credentials are automatically and safely filled without opening the main app.

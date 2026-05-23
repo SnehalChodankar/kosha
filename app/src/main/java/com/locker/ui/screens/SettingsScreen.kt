@@ -163,6 +163,109 @@ fun SettingsScreen(
                 .padding(padding)
                 .verticalScroll(androidx.compose.foundation.rememberScrollState())
         ) {
+            val context = androidx.compose.ui.platform.LocalContext.current
+            val prefs = remember { context.getSharedPreferences("secure_prefs", android.content.Context.MODE_PRIVATE) }
+            
+            var autoLockTimeout by remember { mutableStateOf(prefs.getLong("auto_lock_timeout", 0L)) }
+            var showTimeoutDialog by remember { mutableStateOf(false) }
+
+            var hasDuressPin by remember { mutableStateOf(prefs.getString("duress_pin_hash", null) != null) }
+            var showDuressDialog by remember { mutableStateOf(false) }
+
+            if (showTimeoutDialog) {
+                AlertDialog(
+                    onDismissRequest = { showTimeoutDialog = false },
+                    title = { Text("Auto-lock Timeout") },
+                    text = {
+                        Column {
+                            val options = listOf(0L to "Immediately", 60_000L to "After 1 Minute")
+                            options.forEach { (value, label) ->
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .clickable {
+                                            prefs.edit().putLong("auto_lock_timeout", value).apply()
+                                            autoLockTimeout = value
+                                            showTimeoutDialog = false
+                                        }
+                                        .padding(vertical = 12.dp)
+                                ) {
+                                    RadioButton(selected = autoLockTimeout == value, onClick = null)
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                    Text(label)
+                                }
+                            }
+                        }
+                    },
+                    confirmButton = {
+                        TextButton(onClick = { showTimeoutDialog = false }) { Text("Cancel") }
+                    }
+                )
+            }
+
+            if (showDuressDialog) {
+                var newPin by remember { mutableStateOf("") }
+                var confirmPin by remember { mutableStateOf("") }
+                var error by remember { mutableStateOf("") }
+
+                AlertDialog(
+                    onDismissRequest = { showDuressDialog = false },
+                    title = { Text("Setup Duress PIN") },
+                    text = {
+                        Column {
+                            Text("If forced to unlock Kosha, enter this PIN on the lock screen. It will instantly and permanently wipe all data.")
+                            Spacer(modifier = Modifier.height(16.dp))
+                            OutlinedTextField(
+                                value = newPin,
+                                onValueChange = { newPin = it },
+                                label = { Text("Duress PIN") },
+                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
+                                singleLine = true
+                            )
+                            Spacer(modifier = Modifier.height(8.dp))
+                            OutlinedTextField(
+                                value = confirmPin,
+                                onValueChange = { confirmPin = it },
+                                label = { Text("Confirm PIN") },
+                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
+                                singleLine = true
+                            )
+                            if (error.isNotEmpty()) {
+                                Text(error, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(top = 4.dp))
+                            }
+                        }
+                    },
+                    confirmButton = {
+                        Button(onClick = {
+                            if (newPin.length < 4) {
+                                error = "PIN must be at least 4 digits"
+                            } else if (newPin != confirmPin) {
+                                error = "PINs do not match"
+                            } else {
+                                val md = java.security.MessageDigest.getInstance("SHA-256")
+                                val hashBytes = md.digest(newPin.toByteArray(Charsets.UTF_8))
+                                val hashStr = android.util.Base64.encodeToString(hashBytes, android.util.Base64.NO_WRAP)
+                                prefs.edit().putString("duress_pin_hash", hashStr).apply()
+                                hasDuressPin = true
+                                showDuressDialog = false
+                            }
+                        }) { Text("Save") }
+                    },
+                    dismissButton = {
+                        if (hasDuressPin) {
+                            TextButton(onClick = { 
+                                prefs.edit().remove("duress_pin_hash").apply()
+                                hasDuressPin = false
+                                showDuressDialog = false
+                            }) { Text("Remove") }
+                        } else {
+                            TextButton(onClick = { showDuressDialog = false }) { Text("Cancel") }
+                        }
+                    }
+                )
+            }
+
             Spacer(modifier = Modifier.height(16.dp))
 
             SettingsGroupLabel("App Settings")
@@ -177,10 +280,17 @@ fun SettingsScreen(
             SettingsGroupLabel("Security")
 
             SettingsItem(
-                title = "Auto-lock on Minimize",
-                subtitle = "Lock vault when you switch away from the app",
+                title = "Auto-lock Timeout",
+                subtitle = if (autoLockTimeout == 0L) "Immediately" else "After 1 Minute",
                 icon = { Icon(Icons.Default.Lock, contentDescription = null) },
-                onClick = { showBiometricsDialog = true }
+                onClick = { showTimeoutDialog = true }
+            )
+
+            SettingsItem(
+                title = "Duress PIN",
+                subtitle = if (hasDuressPin) "Configured (Tap to edit/remove)" else "Not set",
+                icon = { Icon(Icons.Default.Warning, contentDescription = null, tint = MaterialTheme.colorScheme.error) },
+                onClick = { showDuressDialog = true }
             )
 
             HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp))

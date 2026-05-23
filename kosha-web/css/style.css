@@ -119,7 +119,6 @@ body {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     gap: 2rem;
-    align-items: start;
 }
 
 .feature-card {
@@ -193,10 +192,13 @@ footer {
 .feature-card {
     cursor: pointer;
     overflow: hidden;
+    display: flex;
+    flex-direction: column;
 }
 
 .expand-hint {
-    margin-top: 1rem;
+    margin-top: auto;
+    padding-top: 1rem;
     color: var(--primary);
     font-size: 0.9rem;
     font-weight: bold;
@@ -318,6 +320,36 @@ footer {
 @keyframes appearSecure {
     0% { opacity: 0; transform: translateX(-50px) scale(0.5); }
     50% { opacity: 0; transform: translateX(-50px) scale(0.5); }
+    100% { opacity: 1; transform: translateX(0) scale(1); }
+}
+
+/* Duress Animation */
+.anim-duress-pin { padding: 0.5rem 1rem; border-radius: 8px; border: 1px solid rgba(255,0,0,0.4); font-size: 0.8rem; background: transparent; }
+.anim-duress-wipe { font-size: 1.5rem; opacity: 0; }
+.anim-duress-fake { padding: 0.5rem 1rem; background: #ef4444; color: white; font-weight: bold; border-radius: 8px; font-size: 0.8rem; opacity: 0; }
+
+.run-anim .anim-duress-pin { animation: moveRightDuress 4s both 0.4s; }
+.run-anim .anim-duress-wipe { animation: firePulse 4s both 0.4s; }
+.run-anim .anim-duress-fake { animation: appearFake 4s both 0.4s; }
+
+@keyframes moveRightDuress {
+    0% { transform: translateX(0) scale(1); opacity: 1; }
+    30% { transform: translateX(0) scale(1); opacity: 1; }
+    50% { transform: translateX(30px) scale(0.5); opacity: 0; }
+    100% { transform: translateX(30px) scale(0.5); opacity: 0; }
+}
+
+@keyframes firePulse {
+    0% { transform: scale(0); opacity: 0; }
+    20% { transform: scale(1.5); opacity: 1; text-shadow: 0 0 20px red; }
+    40% { transform: scale(1); opacity: 0; }
+    100% { transform: scale(1); opacity: 0; }
+}
+
+@keyframes appearFake {
+    0% { opacity: 0; transform: translateX(-30px) scale(0.5); }
+    50% { opacity: 0; transform: translateX(-30px) scale(0.5); }
+    70% { opacity: 1; transform: translateX(0) scale(1); }
     100% { opacity: 1; transform: translateX(0) scale(1); }
 }
 

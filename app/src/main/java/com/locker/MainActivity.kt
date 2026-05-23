@@ -20,6 +20,7 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.Button
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -102,6 +103,16 @@ class MainActivity : FragmentActivity() {
         }
     }
 
+    private var lastTouchTime: Long = System.currentTimeMillis()
+    private var inactivityJob: kotlinx.coroutines.Job? = null
+
+    private var showCorruptedDialog by mutableStateOf(false)
+
+    override fun dispatchTouchEvent(ev: android.view.MotionEvent?): Boolean {
+        lastTouchTime = System.currentTimeMillis()
+        return super.dispatchTouchEvent(ev)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         
@@ -113,6 +124,17 @@ class MainActivity : FragmentActivity() {
         setContent {
             LockerTheme {
                 val snackbarHostState = remember { SnackbarHostState() }
+
+                if (showCorruptedDialog) {
+                    androidx.compose.material3.AlertDialog(
+                        onDismissRequest = { finish() },
+                        title = { Text("Fatal Error 402", color = MaterialTheme.colorScheme.error) },
+                        text = { Text("Encryption keys corrupted. Security protocol triggered. Vault unrecoverable.") },
+                        confirmButton = {
+                            Button(onClick = { finish() }) { Text("Close") }
+                        }
+                    )
+                }
                 
                 Surface(
                     modifier = Modifier.fillMaxSize(),
@@ -121,13 +143,16 @@ class MainActivity : FragmentActivity() {
                     androidx.compose.animation.Crossfade(targetState = currentRootScreen, label = "RootScreen") { screen ->
                         when (screen) {
                             RootScreen.AUTH -> {
-                                AuthScreen(onAuthenticateClick = { 
-                                    if (BYPASS_BIOMETRICS_FOR_TESTING) {
-                                        initializeDatabaseAndViewModel()
-                                    } else {
-                                        showBiometricPrompt() 
-                                    }
-                                })
+                                AuthScreen(
+                                    onAuthenticateClick = { 
+                                        if (BYPASS_BIOMETRICS_FOR_TESTING) {
+                                            initializeDatabaseAndViewModel()
+                                        } else {
+                                            showBiometricPrompt() 
+                                        }
+                                    },
+                                    onDuressTriggered = { wipeAndReset() }
+                                )
                             }
                             RootScreen.MAIN_APP -> {
                                 Scaffold(
@@ -310,6 +335,24 @@ class MainActivity : FragmentActivity() {
         }
     }
 
+    private fun wipeAndReset() {
+        try {
+            val prefs = getSharedPreferences("secure_prefs", Context.MODE_PRIVATE)
+            prefs.edit().clear().apply()
+            
+            // Delete actual database files
+            val dbName = "locker_encrypted.db"
+            applicationContext.getDatabasePath(dbName).delete()
+            applicationContext.getDatabasePath("$dbName-journal").delete()
+            applicationContext.getDatabasePath("$dbName-shm").delete()
+            applicationContext.getDatabasePath("$dbName-wal").delete()
+
+            showCorruptedDialog = true
+        } catch (e: Exception) {
+            android.util.Log.e("Locker", "Failed to wipe database", e)
+        }
+    }
+
     private fun showBiometricPrompt() {
         isExternalActionActive = true
         val executor = ContextCompat.getMainExecutor(this)
@@ -324,6 +367,7 @@ class MainActivity : FragmentActivity() {
                 override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
                     super.onAuthenticationSucceeded(result)
                     isExternalActionActive = false
+                    lastTouchTime = System.currentTimeMillis() // Reset timer on unlock
                     initializeDatabaseAndViewModel()
                 }
 
@@ -368,15 +412,12 @@ class MainActivity : FragmentActivity() {
                 return cipher.doFinal(cipherText)
             } catch (e: Exception) {
                 // Stored passphrase was encrypted with a different key
-                // (e.g. test key → real key switch). Wipe it and start fresh.
                 android.util.Log.w("Locker", "Passphrase decryption failed — key mismatch? Resetting.", e)
                 prefs.edit().clear().apply()
-                // Also delete the stale SQLCipher database so Room starts clean
                 applicationContext.getDatabasePath("locker_encrypted.db").delete()
             }
         }
 
-        // Generate a brand-new 32-byte passphrase and store it
         return generateAndStoreNewPassphrase(prefs)
     }
 
@@ -397,16 +438,42 @@ class MainActivity : FragmentActivity() {
 
     override fun onResume() {
         super.onResume()
-        // Reset external action flag when app comes to foreground
         isExternalActionActive = false
+        
+        val prefs = getSharedPreferences("secure_prefs", Context.MODE_PRIVATE)
+        val timeout = prefs.getLong("auto_lock_timeout", 0L)
+
+        if (currentRootScreen != RootScreen.AUTH && timeout > 0) {
+            if (System.currentTimeMillis() - lastTouchTime > timeout) {
+                currentRootScreen = RootScreen.AUTH
+            } else {
+                inactivityJob?.cancel()
+                inactivityJob = lifecycleScope.launch {
+                    while (true) {
+                        kotlinx.coroutines.delay(1000)
+                        if (System.currentTimeMillis() - lastTouchTime > timeout) {
+                            currentRootScreen = RootScreen.AUTH
+                            break
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        inactivityJob?.cancel()
     }
 
     override fun onStop() {
         super.onStop()
-        // If app goes to background (minimized) and it's not due to an external action (like biometrics or file picker)
-        // Lock the app by returning to the AUTH screen.
         if (!isExternalActionActive) {
-            currentRootScreen = RootScreen.AUTH
+            val prefs = getSharedPreferences("secure_prefs", Context.MODE_PRIVATE)
+            val timeout = prefs.getLong("auto_lock_timeout", 0L)
+            if (timeout == 0L) {
+                currentRootScreen = RootScreen.AUTH
+            }
         }
     }
 }
