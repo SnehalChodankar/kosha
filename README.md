@@ -64,12 +64,22 @@ If you prefer to review the code and build the application yourself to ensure ma
 
 ---
 
-## 🔒 Security Features
-- **Zero Cloud Infrastructure**: Kosha operates entirely offline. There are no servers, no telemetry, and no tracking.
-- **Biometric Integration**: Seamlessly unlock your vault using your fingerprint, face scan, or device PIN.
-- **Auto-Lock on Minimize**: The moment you switch apps or lock your phone, your vault is immediately re-secured.
-- **SQLCipher**: The entire SQLite database is encrypted at rest using a randomly generated 32-byte passphrase, securely locked in the Android Keystore.
-- **Encrypted Exports**: Safely export your data into a `.kosha` file. Exports are heavily encrypted using ChaCha20-Poly1305 and a uniquely generated 6-digit PIN.
+## ✨ Core Features & Security
+
+### ☁️ Zero Cloud Infrastructure
+Kosha operates 100% offline. We do not run any servers, there are no cloud backups, no telemetry SDKs, and absolutely no tracking. You are the sole owner of your data, ensuring it cannot be breached from a remote server.
+
+### 🛡️ SQLCipher Encrypted Database
+Your data is never stored in plain text. The entire internal SQLite database is encrypted at rest using SQLCipher and military-grade AES-256 GCM encryption. The encryption keys are securely locked inside your device's hardware-backed Android Keystore.
+
+### 👆 Biometric Integration & Auto-Lock
+Seamlessly unlock your vault using your device's native fingerprint or face scanner. For maximum security, Kosha features an aggressive Auto-Lock system—the moment you minimize the app, switch to another app, or lock your phone, your vault is instantly re-secured.
+
+### ⚡ Seamless Autofill
+Kosha acts as a native Android Autofill Service. When you tap a password field in any app or web browser, Kosha gracefully prompts an "Unlock Kosha" chip. It strictly requires a biometric scan before decrypting the vault, ensuring your credentials are automatically and safely filled without opening the main app.
+
+### 📦 Encrypted Exports
+You can safely export your entire vault into a portable `.kosha` file. The exported file is heavily encrypted using the ChaCha20-Poly1305 algorithm and a uniquely generated 6-digit PIN, allowing you to securely transfer your passwords to another device without relying on cloud sync.
 
 ## 🗂️ Project Structure
 - `app/src/main/java/com/locker/`: Core application logic (ViewModels, UI screens, Database layer).
