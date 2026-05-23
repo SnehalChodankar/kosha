@@ -2,6 +2,8 @@ package com.locker.ui.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ContentCopy
@@ -51,7 +53,8 @@ fun GeneratorScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
-                .padding(horizontal = 24.dp),
+                .padding(horizontal = 24.dp)
+                .verticalScroll(androidx.compose.foundation.rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Spacer(modifier = Modifier.height(32.dp))
@@ -80,16 +83,18 @@ fun GeneratorScreen(
             
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceEvenly
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 Button(
+                    modifier = Modifier.weight(1f),
+                    contentPadding = PaddingValues(horizontal = 4.dp),
                     onClick = {
                         generatedPassword = generatePassword(length.toInt(), useUppercase, useNumbers, useSymbols)
                     }
                 ) {
                     Icon(Icons.Default.Refresh, contentDescription = "Regenerate")
-                    Spacer(Modifier.width(8.dp))
-                    Text("Regenerate")
+                    Spacer(Modifier.width(4.dp))
+                    Text("Regenerate", maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
                 }
                 
                 FilledTonalButton(
@@ -104,11 +109,13 @@ fun GeneratorScreen(
                 }
 
                 Button(
+                    modifier = Modifier.weight(1f),
+                    contentPadding = PaddingValues(horizontal = 4.dp),
                     onClick = {
                         onUsePassword(generatedPassword)
                     }
                 ) {
-                    Text("Use Password")
+                    Text("Use Password", maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
                 }
             }
             
