@@ -80,6 +80,11 @@ import androidx.compose.material.icons.filled.Pets
 import androidx.compose.material.icons.filled.School
 import androidx.compose.material.icons.filled.SportsEsports
 import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.FilterChip
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material.icons.filled.Star
@@ -97,18 +102,22 @@ fun DashboardScreen(
     val revealedPasswords by viewModel.revealedPasswords.collectAsState()
     val categories by viewModel.categories.collectAsState()
     var searchQuery by remember { mutableStateOf("") }
+    var selectedCategoryFilter by remember { mutableStateOf<String?>(null) }
     var selectedItemIds by remember { mutableStateOf(setOf<Int>()) }
     val focusManager = LocalFocusManager.current
     val clipboardManager = LocalClipboardManager.current
     val coroutineScope = rememberCoroutineScope()
 
-    val filteredItems = if (searchQuery.isBlank()) {
-        items
-    } else {
-        items.filter { 
-            it.title.lowercase().contains(searchQuery.lowercase()) || 
-            it.username.lowercase().contains(searchQuery.lowercase()) 
+    val filteredItems = items.filter { item ->
+        val matchesSearch = if (searchQuery.isBlank()) true else {
+            item.title.lowercase().contains(searchQuery.lowercase()) || 
+            item.username.lowercase().contains(searchQuery.lowercase()) ||
+            item.category.lowercase().contains(searchQuery.lowercase())
         }
+        val matchesCategory = if (selectedCategoryFilter == null) true else {
+            item.category == selectedCategoryFilter
+        }
+        matchesSearch && matchesCategory
     }
 
     val groupedItems = filteredItems.groupBy { it.category }
@@ -206,7 +215,50 @@ fun DashboardScreen(
                 .padding(horizontal = 16.dp),
             contentPadding = androidx.compose.foundation.layout.PaddingValues(vertical = 16.dp)
         ) {
-            item { Spacer(modifier = Modifier.height(16.dp)) }
+            item { 
+                OutlinedTextField(
+                    value = searchQuery,
+                    onValueChange = { searchQuery = it },
+                    modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp),
+                    placeholder = { Text("Search title, username...") },
+                    leadingIcon = { Icon(Icons.Default.Search, contentDescription = "Search") },
+                    trailingIcon = {
+                        if (searchQuery.isNotEmpty()) {
+                            IconButton(onClick = { searchQuery = "" }) {
+                                Icon(Icons.Default.Clear, contentDescription = "Clear search")
+                            }
+                        }
+                    },
+                    shape = RoundedCornerShape(16.dp),
+                    singleLine = true
+                )
+            }
+
+            if (categories.isNotEmpty()) {
+                item {
+                    LazyRow(
+                        modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        item {
+                            FilterChip(
+                                selected = selectedCategoryFilter == null,
+                                onClick = { selectedCategoryFilter = null },
+                                label = { Text("All") }
+                            )
+                        }
+                        items(categories) { category ->
+                            FilterChip(
+                                selected = selectedCategoryFilter == category.name,
+                                onClick = { 
+                                    selectedCategoryFilter = if (selectedCategoryFilter == category.name) null else category.name 
+                                },
+                                label = { Text(category.name) }
+                            )
+                        }
+                    }
+                }
+            }
 
             groupedItems.forEach { (categoryName, categoryItems) ->
                 item {
