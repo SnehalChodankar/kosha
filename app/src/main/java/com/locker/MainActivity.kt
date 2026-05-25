@@ -97,9 +97,14 @@ class MainActivity : FragmentActivity() {
         }
     }
 
-    private val importLauncher = registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
-        if (uri != null) {
-            pendingImportUri = uri // Trigger PIN input dialog in UI
+    @Deprecated("Deprecated in Java")
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: android.content.Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == 1001 && resultCode == android.app.Activity.RESULT_OK) {
+            val uri = data?.data
+            if (uri != null) {
+                pendingImportUri = uri // Trigger PIN input dialog in UI
+            }
         }
     }
 
@@ -254,10 +259,14 @@ class MainActivity : FragmentActivity() {
                                                             onImportClick = {
                                                                 try {
                                                                     isExternalActionActive = true
-                                                                    importLauncher.launch(arrayOf("*/*"))
+                                                                    val intent = android.content.Intent(android.content.Intent.ACTION_GET_CONTENT).apply {
+                                                                        addCategory(android.content.Intent.CATEGORY_OPENABLE)
+                                                                        type = "*/*"
+                                                                    }
+                                                                    startActivityForResult(android.content.Intent.createChooser(intent, "Select Backup File"), 1001)
                                                                 } catch (e: Exception) {
                                                                     isExternalActionActive = false
-                                                                    android.widget.Toast.makeText(this@MainActivity, "No file manager found", android.widget.Toast.LENGTH_LONG).show()
+                                                                    android.widget.Toast.makeText(this@MainActivity, "Picker Error: ${e.message ?: e.javaClass.simpleName}", android.widget.Toast.LENGTH_LONG).show()
                                                                 }
                                                             },
                                                             onPerformImport = { uri, pin ->

@@ -23,6 +23,15 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.graphics.asImageBitmap
+import java.io.ByteArrayOutputStream
+import androidx.compose.material.icons.filled.Image
 import com.locker.R
 import com.locker.viewmodel.LockerViewModel
 
@@ -44,7 +53,37 @@ fun AddEditScreen(
     var selectedBrand by remember { mutableStateOf<Brand?>(null) }
     var websiteUrl by remember { mutableStateOf("") }
     var notes by remember { mutableStateOf("") }
+    var customIconData by remember { mutableStateOf<ByteArray?>(null) }
     var itemLoaded by remember { mutableStateOf(editingItemId == null) }
+    
+    val context = LocalContext.current
+    val imagePickerLauncher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
+        if (uri != null) {
+            try {
+                val inputStream = context.contentResolver.openInputStream(uri)
+                val originalBitmap = BitmapFactory.decodeStream(inputStream)
+                inputStream?.close()
+
+                if (originalBitmap != null) {
+                    val maxDimension = 96
+                    val width = originalBitmap.width
+                    val height = originalBitmap.height
+                    val ratio = width.toFloat() / height.toFloat()
+                    
+                    val newWidth = if (width > height) maxDimension else (maxDimension * ratio).toInt()
+                    val newHeight = if (height > width) maxDimension else (maxDimension / ratio).toInt()
+                    
+                    val scaledBitmap = Bitmap.createScaledBitmap(originalBitmap, newWidth, newHeight, true)
+                    
+                    val outputStream = ByteArrayOutputStream()
+                    scaledBitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
+                    customIconData = outputStream.toByteArray()
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+    }
 
     LaunchedEffect(editingItemId) {
         if (editingItemId != null) {
@@ -56,7 +95,7 @@ fun AddEditScreen(
                     selectedCategoryName = item.category
                     websiteUrl = item.websiteUrl
                     notes = item.notes
-                    // In a real app we'd map title/brand back, for now assume title matches brand name or just keep text
+                    customIconData = item.customIconData
                     itemLoaded = true
                 }
             }
@@ -212,39 +251,58 @@ fun AddEditScreen(
             Spacer(modifier = Modifier.height(32.dp))
 
             // ── Form Fields ───────────────────────────────────────────────
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Box(
+                    modifier = Modifier
+                        .size(80.dp)
+                        .clip(CircleShape)
+                        .background(MaterialTheme.colorScheme.surfaceVariant)
+                        .clickable { imagePickerLauncher.launch("image/*") },
+                    contentAlignment = Alignment.Center
+                ) {
+                    if (customIconData != null) {
+                        val bmp = BitmapFactory.decodeByteArray(customIconData, 0, customIconData!!.size)
+                        if (bmp != null) {
+                            Image(
+                                bitmap = bmp.asImageBitmap(),
+                                contentDescription = "Custom Logo",
+                                modifier = Modifier.fillMaxSize().clip(CircleShape),
+                                contentScale = ContentScale.Crop
+                            )
+                        }
+                    } else if (selectedBrand != null) {
+                        Image(
+                            painter = painterResource(id = selectedBrand!!.logoRes),
+                            contentDescription = null,
+                            contentScale = ContentScale.Fit,
+                            modifier = Modifier.size(48.dp)
+                        )
+                    } else if (title.isNotBlank()) {
+                        Text(
+                            text = title.first().uppercase(),
+                            color = MaterialTheme.colorScheme.primary,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 32.sp
+                        )
+                    } else {
+                        Icon(Icons.Default.Image, contentDescription = null, modifier = Modifier.size(32.dp), tint = MaterialTheme.colorScheme.onSurfaceVariant)
+                    }
+                }
+                Spacer(modifier = Modifier.height(8.dp))
+                Text("Tap logo to upload custom image", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            }
+
+            Spacer(modifier = Modifier.height(24.dp))
+
             OutlinedTextField(
                 value = title,
                 onValueChange = { title = it },
                 label = { Text("Title  (e.g. Netflix)") },
                 modifier = Modifier.fillMaxWidth(),
-                singleLine = true,
-                leadingIcon = {
-                    if (selectedBrand != null) {
-                        Image(
-                            painter = painterResource(id = selectedBrand!!.logoRes),
-                            contentDescription = null,
-                            contentScale = ContentScale.Fit,
-                            modifier = Modifier
-                                .size(24.dp)
-                                .clip(RoundedCornerShape(4.dp))
-                        )
-                    } else if (title.isNotBlank()) {
-                        Box(
-                            modifier = Modifier
-                                .size(24.dp)
-                                .clip(RoundedCornerShape(4.dp))
-                                .background(MaterialTheme.colorScheme.primary),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(
-                                text = title.first().uppercase(),
-                                color = Color.White,
-                                fontWeight = FontWeight.Bold,
-                                fontSize = 12.sp
-                            )
-                        }
-                    }
-                }
+                singleLine = true
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -300,7 +358,8 @@ fun AddEditScreen(
                                     secretValue = password,
                                     category = selectedCategoryName!!,
                                     websiteUrl = websiteUrl.trim(),
-                                    notes = notes.trim()
+                                    notes = notes.trim(),
+                                    customIconData = customIconData
                                 )
                             )
                         } else {
@@ -310,7 +369,8 @@ fun AddEditScreen(
                                 secret = password, 
                                 categoryName = selectedCategoryName!!,
                                 websiteUrl = websiteUrl.trim(),
-                                notes = notes.trim()
+                                notes = notes.trim(),
+                                customIconData = customIconData
                             )
                         }
                         onSave()

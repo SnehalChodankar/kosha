@@ -57,6 +57,7 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.graphics.asImageBitmap
 import com.locker.data.db.LockerItem
 import com.locker.viewmodel.LockerViewModel
 import kotlinx.coroutines.launch
@@ -378,7 +379,24 @@ fun LockerItemCard(
                         .background(brand?.color?.copy(alpha = 0.12f) ?: MaterialTheme.colorScheme.primary.copy(alpha = 0.12f)),
                     contentAlignment = Alignment.Center
                 ) {
-                    if (brand != null) {
+                    if (item.customIconData != null) {
+                        val bmp = android.graphics.BitmapFactory.decodeByteArray(item.customIconData, 0, item.customIconData.size)
+                        if (bmp != null) {
+                            Image(
+                                bitmap = bmp.asImageBitmap(),
+                                contentDescription = item.title,
+                                modifier = Modifier.fillMaxSize().clip(CircleShape),
+                                contentScale = ContentScale.Crop
+                            )
+                        } else {
+                            Text(
+                                text = item.title.firstOrNull()?.uppercase() ?: "?",
+                                color = MaterialTheme.colorScheme.primary,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 18.sp
+                            )
+                        }
+                    } else if (brand != null) {
                         Image(
                             painter = painterResource(id = brand.logoRes),
                             contentDescription = brand.name,
@@ -387,7 +405,7 @@ fun LockerItemCard(
                         )
                     } else {
                         Text(
-                            text = item.title.first().uppercase(),
+                            text = item.title.firstOrNull()?.uppercase() ?: "?",
                             color = MaterialTheme.colorScheme.primary,
                             fontWeight = FontWeight.Bold,
                             fontSize = 18.sp

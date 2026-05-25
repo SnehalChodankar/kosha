@@ -11,7 +11,7 @@ class LockerRepository(private val lockerDao: LockerDao) {
 
     fun getAllItems(): Flow<List<LockerItem>> = lockerDao.getAllItems()
 
-    suspend fun insertItem(title: String, username: String, secretValue: String, categoryName: String, websiteUrl: String = "", notes: String = "") {
+    suspend fun insertItem(title: String, username: String, secretValue: String, categoryName: String, websiteUrl: String = "", notes: String = "", customIconData: ByteArray? = null) {
         lockerDao.insertItem(
             LockerItem(
                 title = title,
@@ -19,7 +19,8 @@ class LockerRepository(private val lockerDao: LockerDao) {
                 secretValue = secretValue,
                 category = categoryName,
                 websiteUrl = websiteUrl,
-                notes = notes
+                notes = notes,
+                customIconData = customIconData
             )
         )
     }

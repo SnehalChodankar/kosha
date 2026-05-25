@@ -56,9 +56,9 @@ class LockerViewModel(private val repository: LockerRepository) : ViewModel() {
         return repository.getBrandsForCategory(categoryName)
     }
 
-    fun insert(title: String, username: String, secret: String, categoryName: String, websiteUrl: String = "", notes: String = "") {
+    fun insert(title: String, username: String, secret: String, categoryName: String, websiteUrl: String = "", notes: String = "", customIconData: ByteArray? = null) {
         viewModelScope.launch {
-            repository.insertItem(title, username, secret, categoryName, websiteUrl, notes)
+            repository.insertItem(title, username, secret, categoryName, websiteUrl, notes, customIconData)
         }
     }
     
