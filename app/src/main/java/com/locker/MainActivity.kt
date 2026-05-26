@@ -76,6 +76,10 @@ class MainActivity : FragmentActivity() {
     private var selectedCategoryForEdit: String? = null
     private var isExternalActionActive = false
 
+    companion object {
+        var logoPickerCallback: ((android.net.Uri?) -> Unit)? = null
+    }
+
     // Callbacks for Export/Import flow
     private var generatedExportPin: String? by mutableStateOf(null)
     private var pendingImportUri: android.net.Uri? by mutableStateOf(null)
@@ -105,6 +109,9 @@ class MainActivity : FragmentActivity() {
             if (uri != null) {
                 pendingImportUri = uri // Trigger PIN input dialog in UI
             }
+        } else if (requestCode == 1002 && resultCode == android.app.Activity.RESULT_OK) {
+            val uri = data?.data
+            logoPickerCallback?.invoke(uri)
         }
     }
 

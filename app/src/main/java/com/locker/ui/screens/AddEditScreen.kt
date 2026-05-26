@@ -56,32 +56,49 @@ fun AddEditScreen(
     var customIconData by remember { mutableStateOf<ByteArray?>(null) }
     var itemLoaded by remember { mutableStateOf(editingItemId == null) }
     
-    val context = LocalContext.current
-    val imagePickerLauncher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
-        if (uri != null) {
-            try {
-                val inputStream = context.contentResolver.openInputStream(uri)
-                val originalBitmap = BitmapFactory.decodeStream(inputStream)
-                inputStream?.close()
+    var context = LocalContext.current
+    while (context is android.content.ContextWrapper) {
+        if (context is android.app.Activity) break
+        context = context.baseContext
+    }
+    val activity = context as? android.app.Activity
 
-                if (originalBitmap != null) {
-                    val maxDimension = 96
-                    val width = originalBitmap.width
-                    val height = originalBitmap.height
-                    val ratio = width.toFloat() / height.toFloat()
-                    
-                    val newWidth = if (width > height) maxDimension else (maxDimension * ratio).toInt()
-                    val newHeight = if (height > width) maxDimension else (maxDimension / ratio).toInt()
-                    
-                    val scaledBitmap = Bitmap.createScaledBitmap(originalBitmap, newWidth, newHeight, true)
-                    
-                    val outputStream = ByteArrayOutputStream()
-                    scaledBitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
-                    customIconData = outputStream.toByteArray()
+    val launchLogoPicker = {
+        com.locker.MainActivity.logoPickerCallback = { uri ->
+            if (uri != null) {
+                try {
+                    val inputStream = context.contentResolver.openInputStream(uri)
+                    val originalBitmap = BitmapFactory.decodeStream(inputStream)
+                    inputStream?.close()
+
+                    if (originalBitmap != null) {
+                        val maxDimension = 96
+                        val width = originalBitmap.width
+                        val height = originalBitmap.height
+                        val ratio = width.toFloat() / height.toFloat()
+                        
+                        val newWidth = if (width > height) maxDimension else (maxDimension * ratio).toInt()
+                        val newHeight = if (height > width) maxDimension else (maxDimension / ratio).toInt()
+                        
+                        val scaledBitmap = Bitmap.createScaledBitmap(originalBitmap, newWidth, newHeight, true)
+                        
+                        val outputStream = ByteArrayOutputStream()
+                        scaledBitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
+                        customIconData = outputStream.toByteArray()
+                    }
+                } catch (e: Exception) {
+                    e.printStackTrace()
                 }
-            } catch (e: Exception) {
-                e.printStackTrace()
             }
+        }
+        try {
+            val intent = android.content.Intent(android.content.Intent.ACTION_GET_CONTENT).apply {
+                addCategory(android.content.Intent.CATEGORY_OPENABLE)
+                type = "image/*"
+            }
+            activity?.startActivityForResult(android.content.Intent.createChooser(intent, "Select Logo"), 1002)
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
     }
 
@@ -260,7 +277,7 @@ fun AddEditScreen(
                         .size(80.dp)
                         .clip(CircleShape)
                         .background(MaterialTheme.colorScheme.surfaceVariant)
-                        .clickable { imagePickerLauncher.launch("image/*") },
+                        .clickable { launchLogoPicker() },
                     contentAlignment = Alignment.Center
                 ) {
                     if (customIconData != null) {
