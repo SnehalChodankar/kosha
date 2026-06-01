@@ -5,11 +5,11 @@ plugins {
 }
 
 android {
-    namespace = "com.locker"
+    namespace = "com.kosha.app"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.locker"
+        applicationId = "com.kosha.app"
         minSdk = 26
         targetSdk = 34
         versionCode = 1
